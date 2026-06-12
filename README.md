@@ -4,10 +4,15 @@ Claude Code plugin for StoreHub KB writers: capture clean PNGs of BackOffice —
 
 ## Install
 
-In Claude Code:
+In Claude Code — first time only, point Claude Code at this repo:
 
 ```
 /plugin marketplace add AndreaAK8/SHShots
+```
+
+Then install (and later update) with one command:
+
+```
 /plugin install backoffice-screenshot@shshots
 ```
 
