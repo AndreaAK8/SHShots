@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHShots — BackOffice Screenshot Plugin · User Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#ff9419;
+    --orange-deep:#e87f00;
+    --ink:#241f1a;
+    --ink-soft:#4d443c;
+    --paper:#fdf9f3;
+    --paper-warm:#faf2e6;
+    --card:#ffffff;
+    --line:#eadfce;
+    --red:#ea3329;
+    --green:#1e9e6a;
+    --mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Barlow',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    font-size:17px;
+  }
+  /* ---------- grain + atmosphere ---------- */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* ---------- masthead ---------- */
+  header{
+    background:var(--ink);
+    color:var(--paper);
+    padding:64px 24px 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,148,25,.32),transparent 70%);
+  }
+  header::before{
+    content:"SHOTS SHOTS SHOTS SHOTS SHOTS";
+    position:absolute;left:0;bottom:8px;white-space:nowrap;
+    font-family:'Barlow Condensed';font-weight:800;font-size:90px;letter-spacing:14px;
+    color:rgba(255,255,255,.04);
+  }
+  .mast{max-width:880px;margin:0 auto;position:relative;z-index:2}
+  .kicker{
+    display:inline-block;background:var(--orange);color:var(--ink);
+    font-family:'Barlow Condensed';font-weight:700;letter-spacing:3px;font-size:14px;
+    padding:5px 14px;border-radius:3px;text-transform:uppercase;margin-bottom:20px;
+  }
+  h1{
+    font-family:'Barlow Condensed';font-weight:800;font-size:clamp(44px,7vw,76px);
+    line-height:.95;text-transform:uppercase;letter-spacing:1px;
+  }
+  h1 em{font-style:normal;color:var(--orange)}
+  .sub{margin-top:18px;font-size:19px;color:#cfc6ba;max-width:620px;font-weight:400}
+  .meta-row{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px}
+  .meta-row span{border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:5px 14px;color:#e8e0d4}
+  .meta-row span b{color:var(--orange);font-weight:600}
+  /* ---------- TOC ---------- */
+  nav{
+    background:var(--paper-warm);border-bottom:2px solid var(--line);
+    padding:18px 24px;position:sticky;top:0;z-index:50;backdrop-filter:blur(6px);
+  }
+  nav .wrap{max-width:880px;margin:0 auto;display:flex;gap:6px 20px;flex-wrap:wrap;align-items:center}
+  nav a{
+    color:var(--ink-soft);text-decoration:none;font-weight:600;font-size:14.5px;
+    font-family:'Barlow Condensed';letter-spacing:1.2px;text-transform:uppercase;
+    padding:3px 2px;border-bottom:2px solid transparent;transition:.18s;
+  }
+  nav a:hover{color:var(--orange-deep);border-bottom-color:var(--orange)}
+  nav .navnum{color:var(--orange);font-family:var(--mono);font-size:11px;margin-right:3px}
+  /* ---------- layout ---------- */
+  main{max-width:880px;margin:0 auto;padding:30px 24px 90px}
+  section{margin-top:74px;scroll-margin-top:90px}
+  .chap{
+    display:flex;align-items:baseline;gap:18px;border-bottom:3px solid var(--ink);
+    padding-bottom:12px;margin-bottom:30px;
+  }
+  .chap .num{
+    font-family:'Barlow Condensed';font-weight:800;font-size:58px;color:var(--orange);
+    line-height:1;letter-spacing:-1px;
+  }
+  .chap h2{
+    font-family:'Barlow Condensed';font-weight:800;font-size:34px;text-transform:uppercase;
+    letter-spacing:1.5px;
+  }
+  .chap .tag{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft);white-space:nowrap}
+  h3{
+    font-family:'Barlow Condensed';font-weight:700;font-size:22px;letter-spacing:1px;
+    text-transform:uppercase;margin:34px 0 12px;color:var(--ink);
+  }
+  p{margin-bottom:14px;color:var(--ink-soft)}
+  p b,li b{color:var(--ink)}
+  ul,ol{margin:0 0 16px 24px;color:var(--ink-soft)}
+  li{margin-bottom:8px}
+  /* ---------- components ---------- */
+  .lead{
+    font-size:20px;color:var(--ink);font-weight:500;line-height:1.55;
+    border-left:5px solid var(--orange);padding-left:20px;margin-bottom:24px;
+  }
+  .term{
+    background:var(--ink);border-radius:12px;padding:18px 20px;margin:16px 0 22px;
+    font-family:var(--mono);font-size:14.5px;color:#f4ede2;overflow-x:auto;
+    box-shadow:0 10px 30px -18px rgba(36,31,26,.55);
+    position:relative;
+  }
+  .term::before{
+    content:"";display:block;width:44px;height:10px;margin-bottom:14px;
+    background:
+      radial-gradient(circle 5px at 5px 5px,#ff5f57 4.6px,transparent 5px),
+      radial-gradient(circle 5px at 21px 5px,#febc2e 4.6px,transparent 5px),
+      radial-gradient(circle 5px at 37px 5px,#28c840 4.6px,transparent 5px);
+  }
+  .term .c{color:#8d8478}
+  .term .p{color:var(--orange);user-select:none}
+  .term .o{color:#9fd6b5}
+  .term code{font-family:inherit}
+  .inline-code{
+    font-family:var(--mono);font-size:.84em;background:var(--paper-warm);
+    border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--ink);
+    white-space:nowrap;
+  }
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:22px 0}
+  .card{
+    background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    padding:22px 22px 18px;position:relative;transition:.2s;
+    box-shadow:0 4px 18px -14px rgba(36,31,26,.3);
+  }
+  .card:hover{transform:translateY(-3px);border-color:var(--orange);box-shadow:0 14px 30px -16px rgba(232,127,0,.35)}
+  .card .ico{font-size:26px;margin-bottom:10px;display:block}
+  .card h4{font-family:'Barlow Condensed';font-weight:700;font-size:19px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+  .card p{font-size:15px;margin:0}
+  .step{
+    display:flex;gap:18px;margin-bottom:26px;align-items:flex-start;
+  }
+  .step .sn{
+    flex:0 0 44px;height:44px;border-radius:50%;background:var(--orange);color:var(--ink);
+    font-family:'Barlow Condensed';font-weight:800;font-size:22px;
+    display:flex;align-items:center;justify-content:center;margin-top:2px;
+    box-shadow:0 6px 14px -6px rgba(232,127,0,.55);
+  }
+  .step .sb{flex:1}
+  .step h4{font-family:'Barlow';font-weight:700;font-size:18px;margin-bottom:4px}
+  .step p{font-size:16px;margin-bottom:8px}
+  .callout{
+    border-radius:12px;padding:18px 22px;margin:20px 0;font-size:15.5px;
+    border:1.5px solid;display:flex;gap:14px;align-items:flex-start;
+  }
+  .callout .ci{font-size:20px;line-height:1.4}
+  .callout.warn{background:#fff7ec;border-color:#f6cf9a;color:#7a4a08}
+  .callout.good{background:#eefaf3;border-color:#bfe5d0;color:#155c3f}
+  .callout.danger{background:#fdf0ef;border-color:#f3c2be;color:#8c2620}
+  .callout b{color:inherit}
+  table{width:100%;border-collapse:collapse;margin:18px 0 26px;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 4px 18px -14px rgba(36,31,26,.3)}
+  th{
+    background:var(--ink);color:var(--paper);text-align:left;padding:12px 16px;
+    font-family:'Barlow Condensed';font-weight:700;letter-spacing:1.2px;text-transform:uppercase;font-size:14px;
+  }
+  td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-soft)}
+  tr:last-child td{border-bottom:none}
+  td:first-child{font-weight:600;color:var(--ink)}
+  .flag{font-family:var(--mono);font-size:13px;background:var(--paper-warm);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
+  .style-strip{
+    display:flex;gap:14px;flex-wrap:wrap;margin:20px 0;
+  }
+  .swatch{
+    flex:1;min-width:150px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:12px;overflow:hidden;
+  }
+  .swatch .sw-top{height:64px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;font-size:15px}
+  .swatch .sw-bot{padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .pill{
+    display:inline-block;font-family:'Barlow Condensed';font-weight:700;font-size:13px;
+    letter-spacing:1.5px;text-transform:uppercase;border-radius:99px;padding:3px 12px;margin-left:8px;vertical-align:middle;
+  }
+  .pill.now{background:#eefaf3;color:var(--green);border:1px solid #bfe5d0}
+  .pill.soon{background:var(--paper-warm);color:var(--ink-soft);border:1px solid var(--line)}
+  .qa{margin-bottom:18px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .qa summary{
+    cursor:pointer;padding:16px 20px;font-weight:700;font-size:16px;list-style:none;
+    display:flex;gap:12px;align-items:center;
+  }
+  .qa summary::before{content:"+";color:var(--orange);font-family:var(--mono);font-weight:600;font-size:20px;transition:.2s}
+  .qa[open] summary::before{transform:rotate(45deg)}
+  .qa .qa-body{padding:0 20px 18px 44px;font-size:15.5px;color:var(--ink-soft)}
+  .qa .qa-body p{margin-bottom:10px}
+  footer{
+    background:var(--ink);color:#cfc6ba;text-align:center;padding:44px 24px;margin-top:40px;
+    font-size:14.5px;
+  }
+  footer b{color:var(--orange)}
+  .dl-bar{
+    position:fixed;right:22px;bottom:22px;z-index:100;
+  }
+  .dl-bar button{
+    font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;
+    background:var(--orange);color:var(--ink);border:none;border-radius:99px;padding:13px 24px;cursor:pointer;
+    box-shadow:0 10px 26px -8px rgba(232,127,0,.65);transition:.2s;
+  }
+  .dl-bar button:hover{transform:translateY(-2px);background:var(--orange-deep);color:#fff}
+  @media print{
+    nav,.dl-bar{display:none}
+    header::before{display:none}
+    body::before{display:none}
+  }
+  @media (max-width:640px){
+    .chap .num{font-size:40px}
+    .chap h2{font-size:26px}
+    .chap .tag{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mast">
+    <span class="kicker">StoreHub · Internal Tool · User Guide</span>
+    <h1>SH<em>Shots</em><br>BackOffice Screenshot Plugin</h1>
+    <p class="sub">Capture clean, annotated screenshots of BackOffice — straight from your own logged-in Chrome. Use them anywhere: KB articles, Jira tickets, Lark docs, training decks. No CleanShot. No paid apps. No login walls. Just ask Claude.</p>
+    <div class="meta-row">
+      <span>plugin <b>backoffice-screenshot</b></span>
+      <span>repo <b>github.com/AndreaAK8/SHShots</b></span>
+      <span>platform <b>macOS + Chrome + Claude Code</b></span>
+      <span>guide v1 · June 2026</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#what"><span class="navnum">01</span>What it does</a>
+    <a href="#need"><span class="navnum">02</span>What you need</a>
+    <a href="#install"><span class="navnum">03</span>Install</a>
+    <a href="#firstrun"><span class="navnum">04</span>First-run setup</a>
+    <a href="#use"><span class="navnum">05</span>Daily use</a>
+    <a href="#style"><span class="navnum">06</span>Annotation style</a>
+    <a href="#trouble"><span class="navnum">07</span>Troubleshooting</a>
+    <a href="#faq"><span class="navnum">08</span>FAQ</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ 01 WHAT ============ -->
+<section id="what">
+  <div class="chap"><span class="num">01</span><h2>What this plugin does</h2><span class="tag">2 min read</span></div>
+  <p class="lead">You write KB articles. Articles need screenshots. Getting a clean BackOffice screenshot used to mean paid tools, sandbox login walls, or cropping by hand. SHShots removes all of that — you ask Claude in plain English, and a finished, annotated, KB-ready PNG comes back.</p>
+
+  <div class="card-grid">
+    <div class="card"><span class="ico">🔓</span><h4>Pre-GA screens, no login wall</h4><p>It drives <b>your own</b> Chrome window — the one you're already logged into. Feature-flagged and pre-release pages you can see, it can capture. Your password is never typed, stored, or seen by the AI.</p></div>
+    <div class="card"><span class="ico">🎯</span><h4>Finds the right window</h4><p>Targets the Chrome window by its URL — not just "whatever's in front". Your other windows and tabs are left alone, and the screenshot never grabs your bookmarks bar.</p></div>
+    <div class="card"><span class="ico">⏱️</span><h4>Spinner-proof timing</h4><p>It waits for the page to confirm it has fully finished loading before shooting — so no half-loaded charts or skeleton screens in your shot.</p></div>
+    <div class="card"><span class="ico">✅</span><h4>Self-verifying</h4><p>After every capture, Claude <b>looks at the image</b> and confirms it actually shows what you asked for — wrong window, black screen, or wrong page get caught and re-shot, not sent to you broken.</p></div>
+    <div class="card"><span class="ico">🖍️</span><h4>Annotates in the house style</h4><p>Red rounded boxes, tapered arrows, blur for sensitive data, rounded corners — the exact style used across StoreHub KB articles (more in <a href="#style">chapter 06</a>).</p></div>
+    <div class="card"><span class="ico">📜</span><h4>Full-page capture</h4><p>Pages taller than the screen are captured in slices and stitched into one seamless full-page image — scrollbars and floating buttons cleaned out of the seam.</p></div>
+  </div>
+
+  <h3>What it will NOT do</h3>
+  <ul>
+    <li><b>It never logs in for you.</b> You log into BackOffice yourself. The plugin only drives a window that is already logged in.</li>
+    <li><b>It never stores credentials.</b> There is no password field, no token, nothing saved.</li>
+    <li><b>It won't capture while you're mid-click.</b> Captures need the Chrome window in front for ~20–30 seconds — Claude will tell you before it starts (see <a href="#use">chapter 05</a>).</li>
+  </ul>
+</section>
+
+<!-- ============ 02 NEED ============ -->
+<section id="need">
+  <div class="chap"><span class="num">02</span><h2>What you need</h2><span class="tag">checklist</span></div>
+  <table>
+    <tr><th>Requirement</th><th>Why</th><th>Check</th></tr>
+    <tr><td>A Mac</td><td>The capture pipeline uses macOS built-ins (<span class="inline-code">screencapture</span>, AppleScript). Windows is not supported.</td><td>—</td></tr>
+    <tr><td>Google Chrome</td><td>The plugin drives Chrome specifically. Safari/Arc/Edge won't work.</td><td>—</td></tr>
+    <tr><td>Claude Code</td><td>This is a Claude Code plugin — terminal app, desktop app, or VS Code extension all work.</td><td><span class="inline-code">claude --version</span></td></tr>
+    <tr><td>Python 3 + Pillow</td><td>Annotations (boxes, arrows, blur, rounded corners) are drawn with Pillow.</td><td><span class="inline-code">python3 -c "import PIL; print('ok')"</span></td></tr>
+    <tr><td>BackOffice access</td><td>You log in yourself, with your own account, on whichever environment you're documenting.</td><td>—</td></tr>
+  </table>
+  <div class="callout warn"><span class="ci">📦</span><div>Missing Pillow? Install it once with <span class="inline-code">pip3 install pillow</span>. That's the only extra install most people need.</div></div>
+</section>
+
+<!-- ============ 03 INSTALL ============ -->
+<section id="install">
+  <div class="chap"><span class="num">03</span><h2>Install</h2><span class="tag">~1 minute</span></div>
+  <p class="lead">Two commands, typed <b>inside Claude Code</b> (not the plain terminal). The first is a one-time pointer that tells Claude Code where the plugin lives — the repo address is baked into the command, so there's no GitHub link to visit, nothing to download, and no GitHub account needed. The second installs (and later updates) the plugin.</p>
+
+  <div class="step">
+    <div class="sn">1</div>
+    <div class="sb">
+      <h4>Point Claude Code at the repo <span style="font-weight:400;color:var(--ink-soft)">(one time only)</span></h4>
+      <div class="term"><span class="p">&gt; </span><code>/plugin marketplace add AndreaAK8/SHShots</code></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="sn">2</div>
+    <div class="sb">
+      <h4>Install the plugin</h4>
+      <div class="term"><span class="p">&gt; </span><code>/plugin install backoffice-screenshot@shshots</code><br><span class="c"># later, to update to the newest version, run the same command again</span></div>
+    </div>
+  </div>
+  <div class="callout good"><span class="ci">✅</span><div><b>That's it for install.</b> Restart your Claude Code session and the skill is live. Next: a few one-time macOS permissions (chapter 04) — Claude walks you through these the first time you ask for a screenshot, so you can also just skip ahead and try it.</div></div>
+</section>
+
+<!-- ============ 04 FIRST RUN ============ -->
+<section id="firstrun">
+  <div class="chap"><span class="num">04</span><h2>First-run setup</h2><span class="tag">one-time · ~3 minutes</span></div>
+  <p class="lead">macOS protects your screen and your browser from automation — rightly so. The first capture needs three approvals. You only ever do this once per machine.</p>
+
+  <div class="step">
+    <div class="sn">1</div>
+    <div class="sb">
+      <h4>Automation → Google Chrome</h4>
+      <p>The first time the plugin talks to Chrome, macOS shows a popup: <i>"…wants to control Google Chrome"</i>. Click <b>Allow</b>. If you accidentally clicked Don't Allow, fix it under <b>System Settings → Privacy &amp; Security → Automation</b> → enable Google Chrome for your terminal app.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="sn">2</div>
+    <div class="sb">
+      <h4>Screen Recording for your terminal</h4>
+      <p>Go to <b>System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording</b> and switch ON the app you run Claude Code in (Terminal, iTerm, or Visual Studio Code). Then <b>quit and reopen that app</b> — the grant only takes effect after a restart.</p>
+      <div class="callout danger"><span class="ci">⬛</span><div><b>Skipped this?</b> Every screenshot comes out pure black. It's the #1 first-run issue — see <a href="#trouble">Troubleshooting</a>.</div></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="sn">3</div>
+    <div class="sb">
+      <h4>Let Chrome accept JavaScript from automation</h4>
+      <p>The plugin reads the page (Is it loaded? Where is that button?) by asking Chrome to run tiny snippets of JavaScript. Chrome ships with this switched off. Turn it on either from Chrome's menu bar: <b>View → Developer → Allow JavaScript from Apple Events</b>, or — if that menu doesn't stick — run this in your terminal and restart Chrome:</p>
+      <div class="term"><span class="p">$ </span><code>defaults write com.google.Chrome AllowJavascriptAppleEvents -bool true</code></div>
+      <div class="callout warn"><span class="ci">🔍</span><div>This setting only allows <b>page-reading and scrolling</b> by tools you run on your own Mac. It does not expose your browser to websites or anything remote.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 USE ============ -->
+<section id="use">
+  <div class="chap"><span class="num">05</span><h2>Daily use</h2><span class="tag">the fun part</span></div>
+  <p class="lead">Open BackOffice in Chrome, log in, then just tell Claude what you want. Plain English. It handles navigation, waiting, capture, verification, and annotation.</p>
+
+  <h3>Example asks</h3>
+  <div class="term">
+    <span class="p">&gt; </span><code>Capture the Promotions list page in BackOffice</code><br><br>
+    <span class="p">&gt; </span><code>Screenshot the Wastage Insights dashboard — full page, and blur anything sensitive</code><br><br>
+    <span class="p">&gt; </span><code>Capture the Employees page. Box the 'Employees' item in the sidebar and the '+ Add Employee' button, with arrows.</code><br><br>
+    <span class="p">&gt; </span><code>I have a KB draft with [SCREENSHOT: ...] placeholders — capture all of them from this BackOffice page and follow the instructions in each placeholder.</code>
+  </div>
+
+  <h3>How a capture session flows</h3>
+  <div class="step"><div class="sn">1</div><div class="sb"><h4>You log in</h4><p>Open the BackOffice page (any environment — production, test, sandbox) in Chrome and log in yourself. Tell Claude which page or paste the URL.</p></div></div>
+  <div class="step"><div class="sn">2</div><div class="sb"><h4>Claude checks the page</h4><p>It finds your window by URL, confirms the page has fully loaded, and locates the exact elements it needs to frame or annotate. If a section name is ambiguous, it asks you first instead of guessing.</p></div></div>
+  <div class="step"><div class="sn">3</div><div class="sb"><h4>Hands off for ~20–30 seconds</h4><p>Claude tells you it's about to capture and brings the Chrome window to the front. <b>Don't switch apps or click during this window</b> — the capture photographs your actual screen, so whatever's in front is what gets shot. When it says done, the screen is yours again.</p></div></div>
+  <div class="step"><div class="sn">4</div><div class="sb"><h4>Verify → annotate → deliver</h4><p>Claude looks at each capture to confirm it's correct, applies the annotations you asked for, rounds the corners, blurs anything sensitive, and hands you the finished PNG — or inserts it directly into your Lark doc if you asked for that.</p></div></div>
+
+  <div class="callout good"><span class="ci">💡</span><div><b>Pro move:</b> batch your asks. "Capture these 7 sections" runs as one ~25-second screen session instead of seven interruptions.</div></div>
+
+  <h3>Asking for annotations</h3>
+  <p>Describe what to point at the way you'd tell a colleague — Claude finds the pixel coordinates itself:</p>
+  <ul>
+    <li>"Box the <b>'Apply'</b> button and point an arrow at it"</li>
+    <li>"Arrow pointing at the <b>'Daily'</b> dropdown on the right of the chart"</li>
+    <li>"Blur the <b>email and phone columns</b> — they show real staff data"</li>
+    <li>"Crop to just the <b>filter row</b> at the top"</li>
+  </ul>
+</section>
+
+<!-- ============ 06 STYLE ============ -->
+<section id="style">
+  <div class="chap"><span class="num">06</span><h2>The annotation style</h2><span class="tag">locked · do not freestyle</span></div>
+  <p class="lead">Every mark the plugin draws follows one locked house style, so screenshots look identical no matter who captured them. You never pick colors or shapes — consistency is the whole point.</p>
+
+  <div class="style-strip">
+    <div class="swatch"><div class="sw-top" style="background:#ea3329">SH RED</div><div class="sw-bot">#EA3329 — the only annotation color</div></div>
+    <div class="swatch"><div class="sw-top" style="background:#fff;color:#241f1a;border-bottom:1px solid var(--line)"><span style="border:3px solid #ea3329;border-radius:8px;padding:4px 18px">BOX</span></div><div class="sw-bot">Rounded-corner rectangle, 4px stroke</div></div>
+    <div class="swatch"><div class="sw-top" style="background:#fff;color:#ea3329;border-bottom:1px solid var(--line);font-size:30px">⬅</div><div class="sw-bot">Tapered arrow — thin tail, solid head</div></div>
+    <div class="swatch"><div class="sw-top" style="background:linear-gradient(90deg,#888,#ccc);filter:blur(0px);color:#fff;text-shadow:0 0 8px #888">▒▒ BLUR ▒▒</div><div class="sw-bot">Gaussian blur over sensitive regions</div></div>
+  </div>
+
+  <table>
+    <tr><th>Element</th><th>Spec</th></tr>
+    <tr><td>Color</td><td>#EA3329 red — every box, every arrow. No other colors.</td></tr>
+    <tr><td>Boxes</td><td>Rounded corners (8px radius), 4px stroke, drawn around the exact UI element with a small breathing margin.</td></tr>
+    <tr><td>Arrows</td><td>Tapered: a thin tail that widens into a solid triangular head. Points left or right, tip lands just beside the target. All edges antialiased — no jaggies.</td></tr>
+    <tr><td>Blur</td><td>Optional Gaussian smudge over emails, phone numbers, real customer names — anything that shouldn't ship in a public article.</td></tr>
+    <tr><td>Finish</td><td>The screenshot itself gets gently rounded corners (transparent), matching the KB look.</td></tr>
+    <tr><td>Browser chrome</td><td>Tab bar, omnibox, and bookmarks are always stripped — the image starts at the page content.</td></tr>
+  </table>
+
+  <h3>For the curious: the CLI underneath</h3>
+  <p>You normally never touch this — Claude drives it for you. But the annotation engine is a plain Python script you can also run by hand:</p>
+  <div class="term">
+    <span class="p">$ </span><code>python3 scripts/annotate.py shot.png \</code><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;--box 50,40,120,60 \</code> <span class="c"># rounded red box at X,Y sized WxH</span><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;--arrow 200,150,right \</code> <span class="c"># tapered arrow pointing at that pixel</span><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;--blur 1340,380,720,800 \</code> <span class="c"># smudge a sensitive region</span><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;--crop-chrome 1440 \</code> <span class="c"># strip the browser bar (window width in points)</span><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;--round 24 --out final.png</code> <span class="c"># rounded corners + output path</span>
+  </div>
+</section>
+
+<!-- ============ 07 TROUBLESHOOT ============ -->
+<section id="trouble">
+  <div class="chap"><span class="num">07</span><h2>Troubleshooting</h2><span class="tag">when shots go wrong</span></div>
+  <table>
+    <tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr>
+    <tr>
+      <td>Screenshot is pure black</td>
+      <td>Screen Recording permission missing — or macOS silently revoked it (it re-asks periodically).</td>
+      <td>Open <b>System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording</b>, make sure your terminal app is ON. Just visiting this panel often refreshes a revoked grant. If it was OFF, toggle it on and restart the terminal app.</td>
+    </tr>
+    <tr>
+      <td>"Executing JavaScript through AppleScript is turned off"</td>
+      <td>Chrome's automation-JS setting is off (or didn't stick from the menu).</td>
+      <td>Run <span class="inline-code">defaults write com.google.Chrome AllowJavascriptAppleEvents -bool true</span> then fully quit and reopen Chrome.</td>
+    </tr>
+    <tr>
+      <td>Captured the wrong app / your Slack / Lark</td>
+      <td>You switched apps during the hands-off window.</td>
+      <td>Nothing broke — Claude's verification catches it and re-shoots. Keep hands off until it says done.</td>
+    </tr>
+    <tr>
+      <td>Captured the wrong Chrome window</td>
+      <td>Multiple BackOffice windows open on similar pages.</td>
+      <td>The plugin targets by URL, so this is rare — but tell Claude which exact URL if you have several environments open at once.</td>
+    </tr>
+    <tr>
+      <td>Page elements look half-loaded</td>
+      <td>Very slow connection beat the load check.</td>
+      <td>Ask Claude to re-capture — it re-verifies readiness each time. Mention "wait for the charts" for data-heavy dashboards.</td>
+    </tr>
+    <tr>
+      <td>"…wants to control Google Chrome" popup again</td>
+      <td>macOS re-confirms Automation grants occasionally, or you updated your terminal app.</td>
+      <td>Click Allow. One click, you're back.</td>
+    </tr>
+    <tr>
+      <td>Annotation points at slightly the wrong spot</td>
+      <td>Your Chrome zoom level changed mid-session (coordinates are zoom-dependent).</td>
+      <td>Tell Claude — it re-reads the layout and redraws. Avoid changing zoom between ask and capture.</td>
+    </tr>
+  </table>
+  <div class="callout warn"><span class="ci">🆘</span><div><b>Still stuck?</b> Ping <b>Andrea (AK)</b> with the broken PNG and what you asked for — most issues are a one-line fix.</div></div>
+</section>
+
+<!-- ============ 08 FAQ ============ -->
+<section id="faq">
+  <div class="chap"><span class="num">08</span><h2>FAQ</h2><span class="tag">quick answers</span></div>
+
+  <details class="qa"><summary>Where can I use the screenshots — only KB articles?</summary><div class="qa-body"><p><b>Anywhere.</b> The output is a normal PNG saved on your Mac. Paste it into Jira tickets, Lark docs, Confluence pages, training decks, chat — anything that takes an image. KB articles are just the most common use. (Automatic insertion into Lark docs at <span class="inline-code">[SCREENSHOT: …]</span> placeholders is also available — see below.)</p></div></details>
+
+  <details class="qa"><summary>Does the AI see or store my BackOffice password?</summary><div class="qa-body"><p><b>No — by design.</b> You log in yourself, in your own Chrome. The plugin only interacts with a window that's already authenticated. There is no flow anywhere in the plugin that asks for, types, or saves a credential.</p></div></details>
+
+  <details class="qa"><summary>Can it capture test / staging / pre-GA environments?</summary><div class="qa-body"><p>Yes — that's its superpower. If <i>you</i> can see the page in Chrome (feature flags, staging URLs, pre-release builds), the plugin can capture it. No sandbox login wall, because there's no separate login at all.</p></div></details>
+
+  <details class="qa"><summary>Why do I have to keep my hands off during capture?</summary><div class="qa-body"><p>The capture photographs your <b>actual screen</b> (that's what lets it bypass login walls). If you bring another app in front mid-shot, that app is what gets photographed. Claude verifies every frame and re-shoots if you photobomb it — but staying hands-off for ~25 seconds is faster.</p></div></details>
+
+  <details class="qa"><summary>Can it put screenshots straight into my Lark doc?</summary><div class="qa-body"><p>Yes — if your KB draft uses <span class="inline-code">[SCREENSHOT: description]</span> placeholders, ask Claude to capture them all and insert each image under its placeholder. (Requires <span class="inline-code">lark-cli</span> set up on your machine; ask AK.)</p></div></details>
+
+  <details class="qa"><summary>Can I change the annotation color or arrow shape?</summary><div class="qa-body"><p>No — the style is locked so every StoreHub KB screenshot looks the same regardless of author. If the style itself needs to evolve, raise it with AK; it changes in one place for everyone.</p></div></details>
+
+  <details class="qa"><summary>Does it work on Windows or with Safari?</summary><div class="qa-body"><p>Not currently. The pipeline is built on macOS built-ins and Chrome's AppleScript support. macOS + Chrome only.</p></div></details>
+
+  <details class="qa"><summary>What's coming next?</summary><div class="qa-body">
+    <p><span class="pill now">live now</span> Window capture · full-page stitch · annotations · blur · rounded corners · Lark doc insertion</p>
+    <p><span class="pill soon">coming</span> Section-level capture (shoot just one table/card) · GIF mode for 4+ steps on the same screen · Jira-driven capture (AI reads the ticket, tries the behavior in BackOffice, captures it)</p>
+  </div></details>
+</section>
+
+</main>
+
+<div class="dl-bar"><button onclick="window.print()">⤓ Save as PDF</button></div>
+
+<footer>
+  <b>SHShots</b> · built by Andrea Kaur (AK) · StoreHub Training &amp; KB<br>
+  Repo: github.com/AndreaAK8/SHShots · Questions → ping AK on Lark<br>
+  <span style="opacity:.6">This guide is a single HTML file — share it as-is. It works offline and prints clean.</span>
+</footer>
+
+</body>
+</html>
