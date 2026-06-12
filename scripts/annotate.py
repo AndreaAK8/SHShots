@@ -29,27 +29,38 @@ _STROKE = 4       # box border width
 _RADIUS = 8       # box corner radius
 
 
+_SS = 4  # supersampling factor — PIL draws hard (jaggy) edges; draw at 4x
+         # on a transparent overlay, downscale with LANCZOS, then composite.
+
+
 def annotate(img, boxes=None, arrows=None, scale=1):
-    """Draw AK-style boxes and arrows on a PIL image (mutates and returns it).
+    """Draw AK-style boxes and arrows on a PIL image (returns RGB image).
 
     boxes:  list of (x, y, w, h) rectangles in image pixels.
     arrows: list of (tip_x, tip_y) or (tip_x, tip_y, "left"|"right") —
             the arrow POINTS toward that pixel. Default direction: right.
     scale:  2 on Retina captures so stroke/arrow sizes match the 1x look.
+
+    All marks are rendered antialiased (supersampled overlay) — AK flagged
+    jaggy arrow edges on 2026-06-12.
     """
-    draw = ImageDraw.Draw(img)
+    overlay = Image.new("RGBA", (img.width * _SS, img.height * _SS), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    s = scale * _SS
+    red = AK_RED + (255,)
     for (x, y, w, h) in boxes or []:
-        draw.rounded_rectangle([x, y, x + w, y + h], radius=_RADIUS * scale,
-                               outline=AK_RED, width=_STROKE * scale)
+        draw.rounded_rectangle(
+            [x * _SS, y * _SS, (x + w) * _SS, (y + h) * _SS],
+            radius=_RADIUS * s, outline=red, width=_STROKE * s)
     for arrow in arrows or []:
-        tx, ty = arrow[0], arrow[1]
+        tx, ty = arrow[0] * _SS, arrow[1] * _SS
         direction = arrow[2] if len(arrow) > 2 else "right"
         sign = -1 if direction == "right" else 1   # which side the tail is on
-        base_x = tx + sign * _HEAD_LEN * scale
-        tail_x = base_x + sign * _STEM_LEN * scale
-        half = _HEAD_HALF * scale
-        s_half = _STEM_HALF * scale
-        t_half = _TAIL_HALF * scale
+        base_x = tx + sign * _HEAD_LEN * s
+        tail_x = base_x + sign * _STEM_LEN * s
+        half = _HEAD_HALF * s
+        s_half = _STEM_HALF * s
+        t_half = _TAIL_HALF * s
         draw.polygon([
             (tx, ty),                       # tip
             (base_x, ty - half),            # head corner (top)
@@ -58,7 +69,13 @@ def annotate(img, boxes=None, arrows=None, scale=1):
             (tail_x, ty + t_half),          # thin tail (bottom)
             (base_x, ty + s_half),          # stem meets head (bottom)
             (base_x, ty + half),            # head corner (bottom)
-        ], fill=AK_RED)
+        ], fill=red)
+    overlay = overlay.resize(img.size, Image.LANCZOS)
+    out = img.convert("RGBA")
+    out.alpha_composite(overlay)
+    out = out.convert("RGB")
+    # keep mutate-and-return contract for callers holding the original
+    img.paste(out)
     return img
 
 
