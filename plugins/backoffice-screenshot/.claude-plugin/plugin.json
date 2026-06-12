@@ -1,0 +1,8 @@
+{
+  "name": "backoffice-screenshot",
+  "description": "Capture clean PNGs of StoreHub BackOffice (incl. pre-GA / flag-gated screens) from your own logged-in Chrome on macOS — built-in tools only, no CleanShot.",
+  "version": "1.0.0",
+  "author": {
+    "name": "AndreaAK8"
+  }
+}
