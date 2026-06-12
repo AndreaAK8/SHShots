@@ -1,6 +1,8 @@
 # BackOffice Screenshot
 
-Claude Code plugin for StoreHub KB writers: capture clean PNGs of BackOffice — **including pre-GA / flag-gated screens** — straight from your own logged-in Chrome on macOS. Built-in tools only. No CleanShot, no paid apps, no Playwright login wall.
+**This repo IS the plugin** — one independent Claude Code plugin, nothing else.
+
+For StoreHub KB writers: capture clean PNGs of BackOffice — **including pre-GA / flag-gated screens** — straight from your own logged-in Chrome on macOS. Built-in tools only. No CleanShot, no paid apps, no Playwright login wall.
 
 ## Install
 

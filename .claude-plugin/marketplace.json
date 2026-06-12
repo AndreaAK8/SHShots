@@ -3,14 +3,10 @@
   "owner": {
     "name": "AndreaAK8"
   },
-  "metadata": {
-    "description": "BackOffice screenshot capture for StoreHub KB writers — clean PNGs from your own logged-in Chrome on macOS, built-in tools only.",
-    "version": "1.0.0"
-  },
   "plugins": [
     {
       "name": "backoffice-screenshot",
-      "source": "./plugins/backoffice-screenshot",
+      "source": "./",
       "description": "Capture clean PNGs of StoreHub BackOffice (incl. pre-GA / flag-gated screens) from your own logged-in Chrome on macOS — no CleanShot, no paid apps, no Playwright login wall."
     }
   ]
